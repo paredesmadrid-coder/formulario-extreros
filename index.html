@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Registro de Extreros — VISEGUA S.A.</title>
+<style>
+  :root {
+    --green:      #1D9E75;
+    --green-light:#E1F5EE;
+    --green-dark: #085041;
+    --gray-50:    #F7F7F6;
+    --gray-100:   #EBEBEA;
+    --gray-300:   #BBBBB7;
+    --gray-600:   #5F5E5A;
+    --gray-900:   #1A1A18;
+    --red:        #D85A30;
+    --red-light:  #FAECE7;
+    --amber:      #BA7517;
+    --amber-light:#FAEEDA;
+    --border:     1px solid #E0E0DC;
+    --radius:     8px;
+    --radius-lg:  12px;
+    --shadow:     0 1px 3px rgba(0,0,0,.07);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--gray-50);
+    color: var(--gray-900);
+    font-size: 15px;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+  header {
+    background: var(--green-dark);
+    color: #fff;
+    padding: 1.25rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: sticky; top: 0; z-index: 10;
+  }
+  .logo-circle {
+    width: 42px; height: 42px; border-radius: 50%;
+    background: var(--green);
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 700; font-size: 15px; color: #fff; flex-shrink: 0;
+  }
+  header h1 { font-size: 17px; font-weight: 600; }
+  header p  { font-size: 12px; opacity: .7; margin-top: 1px; }
+  .page { max-width: 720px; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  .config-banner {
+    background: var(--amber-light); border: 1px solid #EFC97A;
+    border-radius: var(--radius); padding: .9rem 1.1rem;
+    font-size: 13px; color: var(--amber); margin-bottom: 1.5rem;
+    display: flex; gap: 10px; align-items: flex-start;
+  }
+  .config-banner input {
+    display: block; width: 100%; margin-top: 6px;
+    padding: 7px 10px; border: 1px solid #EFC97A;
+    border-radius: var(--radius); font-size: 13px;
+    background: #fff; color: var(--gray-900);
+  }
+  .card {
+    background: #fff; border: var(--border);
+    border-radius: var(--radius-lg); padding: 1.25rem 1.5rem;
+    margin-bottom: 1rem; box-shadow: var(--shadow);
+  }
+  .card-title {
+    font-size: 11px; font-weight: 600; text-transform: uppercase;
+    letter-spacing: .07em; color: var(--gray-600);
+    margin-bottom: 1.1rem; padding-bottom: .6rem; border-bottom: var(--border);
+  }
+  .field { margin-bottom: 1rem; }
+  .field:last-child { margin-bottom: 0; }
+  label.field-label { display: block; font-size: 13px; font-weight: 500; color: var(--gray-900); margin-bottom: 5px; }
+  .req { color: var(--red); }
+  input[type=text], input[type=date], input[type=number], select, textarea {
+    width: 100%; padding: 9px 12px; font-size: 14px;
+    border: var(--border); border-radius: var(--radius);
+    background: #fff; color: var(--gray-900); transition: border-color .15s;
+    appearance: none; -webkit-appearance: none;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235F5E5A' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px;
+  }
+  input:focus, select:focus, textarea:focus {
+    outline: none; border-color: var(--green); box-shadow: 0 0 0 3px rgba(29,158,117,.12);
+  }
+  textarea { height: 90px; resize: vertical; }
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  @media(max-width:520px){ .two-col { grid-template-columns: 1fr; } }
+
+  /* DPI */
+  .dpi-wrap { position: relative; }
+  .dpi-status {
+    display: none; font-size: 12px; padding: 5px 10px;
+    border-radius: var(--radius); margin-top: 5px; font-weight: 500;
+  }
+  .dpi-status.ok { display:block; background:var(--green-light); color:var(--green-dark); border:1px solid #9FE1CB; }
+  .dpi-status.nf { display:block; background:var(--red-light); color:var(--red); border:1px solid #F5C4B3; }
+  .dpi-counter { font-size: 12px; color: var(--gray-300); text-align: right; margin-top: 3px; }
+
+  /* Autocomplete dropdown */
+  .autocomplete-list {
+    position: absolute; top: 100%; left: 0; right: 0; z-index: 100;
+    background: #fff; border: var(--border); border-radius: var(--radius);
+    box-shadow: 0 4px 16px rgba(0,0,0,.10); max-height: 200px; overflow-y: auto;
+    display: none;
+  }
+  .autocomplete-list.show { display: block; }
+  .ac-item {
+    padding: 8px 12px; font-size: 13px; cursor: pointer;
+    border-bottom: 1px solid var(--gray-100);
+  }
+  .ac-item:last-child { border-bottom: none; }
+  .ac-item:hover { background: var(--green-light); }
+  .ac-dpi { font-weight: 600; color: var(--green-dark); margin-right: 8px; }
+
+  /* Radio groups */
+  .radio-group { display: flex; flex-direction: column; gap: 7px; }
+  .radio-group label {
+    font-size: 14px; font-weight: 400; display: flex;
+    align-items: flex-start; gap: 9px; cursor: pointer;
+    color: var(--gray-900); line-height: 1.4;
+  }
+  .radio-group input[type=radio] {
+    width: 16px; height: 16px; margin-top: 2px;
+    flex-shrink: 0; accent-color: var(--green);
+  }
+  .cond { display: none; margin-top: .75rem; }
+  .cond.show { display: block; }
+
+  /* DB section */
+  .db-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+  .db-row { display: flex; gap: 8px; margin-bottom: 8px; }
+  .db-row input { flex: 1; font-size: 13px; }
+  .db-stats { font-size: 12px; color: var(--gray-600); margin-bottom: 8px; }
+  .db-stats span { font-weight: 600; color: var(--green-dark); }
+  .db-list {
+    max-height: 200px; overflow-y: auto; font-size: 13px;
+    color: var(--gray-600); border: var(--border);
+    border-radius: var(--radius); padding: 6px 10px; background: var(--gray-50);
+  }
+  .db-item {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 4px 0; border-bottom: 1px solid var(--gray-100);
+  }
+  .db-item:last-child { border-bottom: none; }
+  .db-del { background: none; border: none; color: var(--red); cursor: pointer; font-size: 12px; padding: 2px 6px; }
+  .hint { font-size: 12px; color: var(--gray-600); margin-top: 4px; }
+  .hint a { color: var(--green); }
+
+  /* Buttons */
+  .btn {
+    padding: 8px 16px; border-radius: var(--radius); font-size: 13px;
+    font-weight: 500; cursor: pointer; border: var(--border);
+    background: #fff; color: var(--gray-900); transition: background .12s; white-space: nowrap;
+  }
+  .btn:hover { background: var(--gray-50); }
+  .btn-green { background: var(--green-light); color: var(--green-dark); border-color: #9FE1CB; }
+  .btn-green:hover { background: #c5eedd; }
+  .btn-primary {
+    width: 100%; background: var(--green); color: #fff;
+    border-color: var(--green-dark); font-size: 15px;
+    padding: 13px; margin-top: 1.25rem; border-radius: var(--radius);
+    cursor: pointer; font-weight: 600; transition: background .12s;
+  }
+  .btn-primary:hover { background: #178a63; }
+  .btn-primary:disabled { background: var(--gray-300); border-color: var(--gray-300); cursor: not-allowed; }
+
+  /* Toast */
+  .toast {
+    position: fixed; bottom: 28px; left: 50%;
+    transform: translateX(-50%) translateY(80px);
+    background: var(--green-dark); color: #fff; padding: 12px 24px;
+    border-radius: var(--radius-lg); font-size: 14px; font-weight: 500;
+    box-shadow: 0 4px 16px rgba(0,0,0,.18); transition: transform .3s ease;
+    z-index: 999; white-space: nowrap;
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.error { background: var(--red); }
+
+  input[type=file] { font-size: 13px; color: var(--gray-600); padding: 7px 0; border: none; box-shadow: none; background: transparent; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-circle">VS</div>
+  <div>
+    <h1>Registro de Extreros</h1>
+    <p>VISEGUA S.A. — Sistema de control de coberturas</p>
+  </div>
+</header>
+
+<div class="page">
+
+  <!-- URL Google Sheets -->
+  <div class="config-banner">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.8" style="flex-shrink:0;margin-top:2px">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v4m0 4h.01M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+    </svg>
+    <div style="flex:1">
+      <strong>Configuración Google Sheets</strong> — Pegue la URL de su Google Apps Script para activar el envío automático.
+      <input type="text" id="sheet-url" placeholder="https://script.google.com/macros/s/…/exec" />
+    </div>
+  </div>
+
+  <!-- Información general -->
+  <div class="card">
+    <div class="card-title">Información general</div>
+    <div class="two-col">
+      <div class="field">
+        <label class="field-label">Fecha <span class="req">*</span></label>
+        <input type="date" id="fecha" />
+      </div>
+      <div class="field">
+        <label class="field-label">Nombre del supervisor <span class="req">*</span></label>
+        <input type="text" id="supervisor" placeholder="Nombre completo" />
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Sector <span class="req">*</span></label>
+      <select id="sector">
+        <option value="">— Seleccionar sector —</option>
+        <option>0</option><option>1</option><option>2</option>
+        <option>3</option><option>4</option><option>5</option>
+        <option>SUR Y SACATEPÉQUEZ</option>
+        <option>PATRULLAS</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Datos del extrero -->
+  <div class="card">
+    <div class="card-title">Datos del extrero</div>
+
+    <div class="field">
+      <label class="field-label">DPI <span class="req">*</span> <span style="font-weight:400;color:var(--gray-600)">(8 dígitos)</span></label>
+      <div class="dpi-wrap">
+        <input type="text" id="dpi" placeholder="Ingrese los 8 dígitos del DPI" maxlength="8"
+               oninput="onDpiInput(this.value)" onblur="cerrarAC()" autocomplete="off" />
+        <div class="autocomplete-list" id="ac-list"></div>
+      </div>
+      <div class="dpi-counter" id="dpi-counter">0 / 8</div>
+      <div class="dpi-status" id="dpi-status"></div>
+      <p class="hint">Al escribir los 8 dígitos el nombre se autocompleta automáticamente.</p>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Nombre completo del extrero <span class="req">*</span></label>
+      <input type="text" id="nombre" placeholder="Se autocompleta con el DPI, o ingrese manualmente" />
+    </div>
+
+    <div class="two-col">
+      <div class="field">
+        <label class="field-label">Puesto de origen <span class="req">*</span></label>
+        <input type="text" id="puesto-origen" placeholder="Puesto original" />
+      </div>
+      <div class="field">
+        <label class="field-label">Puesto que cubre <span class="req">*</span></label>
+        <input type="text" id="puesto-cubre" placeholder="Puesto a cubrir" />
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Tipo de turno <span class="req">*</span></label>
+      <div class="radio-group">
+        <label><input type="radio" name="turno" value="DIURNO"> Diurno</label>
+        <label><input type="radio" name="turno" value="NOCTURNO"> Nocturno</label>
+        <label><input type="radio" name="turno" value="ESPECIAL DIURNO"> Especial diurno</label>
+        <label><input type="radio" name="turno" value="ESPECIAL NOCTURNO"> Especial nocturno</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Motivo -->
+  <div class="card">
+    <div class="card-title">Motivo</div>
+    <div class="field">
+      <label class="field-label">Motivo <span class="req">*</span></label>
+      <div class="radio-group">
+        <label><input type="radio" name="motivo" value="FALTA" onchange="onMotivo(this.value)"> Falta</label>
+        <label><input type="radio" name="motivo" value="VACANTE" onchange="onMotivo(this.value)"> Vacante</label>
+        <label><input type="radio" name="motivo" value="SERVICIO ESPECIAL" onchange="onMotivo(this.value)"> Servicio especial</label>
+        <label><input type="radio" name="motivo" value="CUBRE DESCANSO" onchange="onMotivo(this.value)"> Cubre descanso</label>
+        <label><input type="radio" name="motivo" value="CUBRE VACACIONES" onchange="onMotivo(this.value)"> Cubre vacaciones</label>
+        <label><input type="radio" name="motivo" value="CUBRE SUSPENSIÓN" onchange="onMotivo(this.value)"> Cubre suspensión</label>
+        <label><input type="radio" name="motivo" value="CUBRE SU PROPIO DESCANSO" onchange="onMotivo(this.value)"> Cubre su propio descanso</label>
+        <label><input type="radio" name="motivo" value="TRASLADO" onchange="onMotivo(this.value)"> Traslado</label>
+        <label><input type="radio" name="motivo" value="VACANTE POR INCREMENTO" onchange="onMotivo(this.value)"> Vacante por incremento</label>
+        <label><input type="radio" name="motivo" value="ABANDONO DE PUESTO" onchange="onMotivo(this.value)"> Abandono de puesto</label>
+        <label><input type="radio" name="motivo" value="DISPONIBLE EN EL SECTOR POR FALTA DE PUESTO (NO APLICA EXTRA)" onchange="onMotivo(this.value)"> Disponible en el sector por falta de puesto (no aplica extra)</label>
+      </div>
+      <div class="cond" id="cond-servicio">
+        <label class="field-label" style="margin-top:.5rem">Indique qué tipo de servicio especial</label>
+        <input type="text" id="tipo-servicio-especial" placeholder="Descripción del servicio especial" />
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Nombre de quien faltó y/o vacante <span class="req">*</span></label>
+      <input type="text" id="quien-falto" placeholder="Nombre completo" />
+    </div>
+  </div>
+
+  <!-- Motivo inasistencia -->
+  <div class="card">
+    <div class="card-title">Motivo de la falta (inasistencia)</div>
+    <div class="field">
+      <label class="field-label">Seleccione el motivo <span class="req">*</span></label>
+      <div class="radio-group">
+        <label><input type="radio" name="inasistencia" value="ENFERMEDAD"> Enfermedad</label>
+        <label><input type="radio" name="inasistencia" value="CITA IGSS"> Cita IGSS</label>
+        <label><input type="radio" name="inasistencia" value="ASUNTOS PERSONALES"> Asuntos personales</label>
+        <label><input type="radio" name="inasistencia" value="OTRO TIPO DE FALTA CON PREVIO AVISO"> Otro tipo de falta con previo aviso</label>
+        <label><input type="radio" name="inasistencia" value="NO REPORTÓ SU INASISTENCIA - SE DESCONOCE EL MOTIVO"> No reportó su inasistencia — se desconoce el motivo</label>
+        <label><input type="radio" name="inasistencia" value="NO APLICA (PAGO EXTRERO POR MOTIVO DISTINTO A FALTA O INASISTENCIA)"> No aplica (pago extrero por motivo distinto a falta o inasistencia)</label>
+        <label><input type="radio" name="inasistencia" value="NO APLICA INASISTENCIA (PAGO EXTRERO POR SERVICIO ESPECIAL)"> No aplica inasistencia (pago extrero por servicio especial)</label>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pago -->
+  <div class="card">
+    <div class="card-title">Pago</div>
+    <div class="two-col">
+      <div class="field">
+        <label class="field-label">Monto <span class="req">*</span></label>
+        <input type="number" id="monto" placeholder="Q 0.00" min="0" step="0.01" />
+      </div>
+      <div class="field">
+        <label class="field-label">Tipo de pago</label>
+        <select id="tipo-pago">
+          <option value="">— Seleccionar —</option>
+          <option>EFECTIVO (NO TIENE CUENTA)</option>
+          <option>DEPÓSITO SUBCONTRATADO</option>
+          <option>DEPÓSITO</option>
+          <option>EFECTIVO (TIENE CUENTA PERO TIENE PROBLEMA CON BANCO)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  <div class="card">
+    <div class="card-title">Observaciones y adjuntos</div>
+    <div class="field">
+      <label class="field-label">Observaciones adicionales</label>
+      <textarea id="observaciones" placeholder="Ingrese cualquier observación relevante..."></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Adjuntar archivo</label>
+      <input type="file" id="adjunto" accept="image/*,.pdf,.doc,.docx,.xlsx,.xls" />
+      <p class="hint">1 archivo compatible. Tamaño máximo: 10 MB.</p>
+    </div>
+  </div>
+
+  <!-- Base de datos DPI -->
+  <div class="card">
+    <div class="card-title">Base de datos de empleados (DPI — 8 dígitos)</div>
+    <div class="db-stats" id="db-stats">Cargando registros...</div>
+
+    <div class="db-actions">
+      <label class="btn btn-green" style="cursor:pointer">
+        ↑ Importar CSV
+        <input type="file" id="import-csv" accept=".csv,.txt" style="display:none" onchange="importarCSV(this)" />
+      </label>
+      <button class="btn" onclick="exportarDB()">↓ Exportar CSV</button>
+      <button class="btn" onclick="limpiarDB()" style="color:var(--red)">✕ Limpiar base</button>
+    </div>
+    <p class="hint" style="margin-bottom:10px">Formato CSV requerido: <code>DPI,NOMBRE</code> (una fila por empleado). El DPI debe tener 8 dígitos.</p>
+
+    <div class="db-row">
+      <input type="text" id="db-dpi" placeholder="DPI (8 dígitos)" maxlength="8" />
+      <input type="text" id="db-nombre" placeholder="Nombre completo del empleado" />
+      <button class="btn btn-green" onclick="agregarRegistro()">+ Agregar</button>
+    </div>
+
+    <div class="db-list" id="db-lista">
+      <em style="color:var(--gray-300)">Sin registros.</em>
+    </div>
+  </div>
+
+  <button class="btn-primary" id="btn-enviar" onclick="enviar()">Enviar registro →</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── Base de datos de DPI incrustada (desde CSV cargado) ──
+var DB_INICIAL = {
+  "16635822": "prueba 1",
+  "299409538": "prueba 2"
+};
+
+var DB_KEY = 'visegua_dpi_db_v3';
+
+function cargarDB() {
+  try { return JSON.parse(localStorage.getItem(DB_KEY) || 'null') || {}; } catch(e) { return {}; }
+}
+function guardarDB(db) {
+  try { localStorage.setItem(DB_KEY, JSON.stringify(db)); } catch(e) {}
+}
+
+// Inicializar: mezclar DB_INICIAL con la local (la local tiene prioridad)
+function inicializarDB() {
+  var local = cargarDB();
+  var keys = Object.keys(local);
+  if (keys.length === 0) {
+    // Primera vez: cargar la base inicial
+    guardarDB(DB_INICIAL);
+  }
+  // Si ya tiene datos, no sobreescribir (el usuario puede haber importado su CSV completo)
+}
+
+// ── DPI autocomplete ──
+var acTimeout = null;
+
+function onDpiInput(val) {
+  var st = document.getElementById('dpi-status');
+  var nm = document.getElementById('nombre');
+  var counter = document.getElementById('dpi-counter');
+  counter.textContent = val.length + ' / 8';
+  st.className = 'dpi-status';
+
+  clearTimeout(acTimeout);
+  cerrarAC();
+
+  if (val.length === 0) { nm.value = ''; return; }
+
+  // Búsqueda exacta al llegar a 8 dígitos
+  if (val.length === 8) {
+    var db = cargarDB();
+    if (db[val]) {
+      nm.value = db[val];
+      st.textContent = '✓ ' + db[val];
+      st.classList.add('ok');
+    } else {
+      nm.value = '';
+      st.textContent = '⚠ DPI no encontrado — ingrese el nombre manualmente';
+      st.classList.add('nf');
+    }
+    return;
+  }
+
+  // Sugerencias mientras escribe (a partir de 4 dígitos)
+  if (val.length >= 4) {
+    acTimeout = setTimeout(function() { mostrarSugerencias(val); }, 200);
+  }
+}
+
+function mostrarSugerencias(prefix) {
+  var db = cargarDB();
+  var lista = document.getElementById('ac-list');
+  var matches = [];
+  var keys = Object.keys(db);
+  for (var i = 0; i < keys.length && matches.length < 8; i++) {
+    if (keys[i].startsWith(prefix)) {
+      matches.push({ dpi: keys[i], nombre: db[keys[i]] });
+    }
+  }
+  if (matches.length === 0) { lista.classList.remove('show'); return; }
+  lista.innerHTML = matches.map(function(m) {
+    return '<div class="ac-item" onmousedown="seleccionarAC(\'' + m.dpi + '\',\'' + m.nombre.replace(/'/g,"\\x27") + '\')">' +
+           '<span class="ac-dpi">' + m.dpi + '</span>' + m.nombre + '</div>';
+  }).join('');
+  lista.classList.add('show');
+}
+
+function seleccionarAC(dpi, nombre) {
+  document.getElementById('dpi').value = dpi;
+  document.getElementById('nombre').value = nombre;
+  document.getElementById('dpi-counter').textContent = dpi.length + ' / 8';
+  var st = document.getElementById('dpi-status');
+  st.textContent = '✓ ' + nombre;
+  st.className = 'dpi-status ok';
+  cerrarAC();
+}
+
+function cerrarAC() {
+  var lista = document.getElementById('ac-list');
+  if (lista) lista.classList.remove('show');
+}
+
+// ── Motivo condicional ──
+function onMotivo(val) {
+  document.getElementById('cond-servicio').classList.toggle('show', val === 'SERVICIO ESPECIAL');
+}
+
+// ── Gestión de base de datos ──
+function agregarRegistro() {
+  var dpi    = document.getElementById('db-dpi').value.trim();
+  var nombre = document.getElementById('db-nombre').value.trim();
+  if (!dpi || !nombre) { showToast('Ingrese DPI y nombre.', true); return; }
+  if (dpi.length !== 8) { showToast('El DPI debe tener exactamente 8 dígitos.', true); return; }
+  var db = cargarDB();
+  db[dpi] = nombre;
+  guardarDB(db);
+  document.getElementById('db-dpi').value = '';
+  document.getElementById('db-nombre').value = '';
+  renderDB();
+  showToast('Empleado agregado: ' + nombre);
+}
+
+function eliminarRegistro(dpi) {
+  if (!confirm('¿Eliminar el registro DPI ' + dpi + '?')) return;
+  var db = cargarDB();
+  delete db[dpi];
+  guardarDB(db);
+  renderDB();
+}
+
+function renderDB() {
+  var db   = cargarDB();
+  var keys = Object.keys(db).sort();
+  var stats = document.getElementById('db-stats');
+  stats.innerHTML = 'Total de empleados registrados: <span>' + keys.length + '</span>';
+
+  var lista = document.getElementById('db-lista');
+  if (keys.length === 0) {
+    lista.innerHTML = '<em style="color:var(--gray-300)">Sin registros. Importe su CSV o agregue empleados manualmente.</em>';
+    return;
+  }
+  // Mostrar solo los primeros 50 para no saturar el DOM
+  var mostrar = keys.slice(0, 50);
+  lista.innerHTML = mostrar.map(function(k) {
+    return '<div class="db-item"><span><strong>' + k + '</strong> — ' + db[k] + '</span>' +
+           '<button class="db-del" onclick="eliminarRegistro(\'' + k + '\')">✕</button></div>';
+  }).join('') + (keys.length > 50 ? '<div style="padding:6px;font-size:12px;color:var(--gray-600)">… y ' + (keys.length - 50) + ' más (todos disponibles para búsqueda)</div>' : '');
+}
+
+function exportarDB() {
+  var db = cargarDB();
+  var rows = Object.entries(db).map(function(e) { return e[0] + ',' + e[1]; }).join('\n');
+  var blob = new Blob(['DPI,NOMBRE\n' + rows], { type: 'text/csv;charset=utf-8;' });
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'base_dpi_visegua.csv';
+  a.click();
+  showToast('CSV exportado correctamente.');
+}
+
+function importarCSV(input) {
+  var file = input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(e) {
+    var lines = e.target.result.split(/\r?\n/);
+    var db = cargarDB();
+    var count = 0;
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i].trim();
+      if (!line) continue;
+      var parts = line.split(',');
+      if (parts.length >= 2) {
+        var dpi    = parts[0].trim();
+        var nombre = parts.slice(1).join(',').trim();
+        if (dpi && nombre && dpi.toLowerCase() !== 'dpi') {
+          db[dpi] = nombre;
+          count++;
+        }
+      }
+    }
+    guardarDB(db);
+    renderDB();
+    showToast(count + ' empleados importados correctamente.');
+  };
+  reader.readAsText(file, 'UTF-8');
+  input.value = '';
+}
+
+function limpiarDB() {
+  if (!confirm('¿Está seguro de que desea eliminar TODOS los registros de la base de datos?')) return;
+  guardarDB({});
+  renderDB();
+  showToast('Base de datos limpiada.');
+}
+
+// ── Toast ──
+var toastTimer;
+function showToast(msg, error) {
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (error ? ' error' : '');
+  void t.offsetWidth;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { t.classList.remove('show'); }, 3500);
+}
+
+// ── Validación y envío ──
+function v(id) { var el = document.getElementById(id); return el ? el.value.trim() : ''; }
+
+async function enviar() {
+  var url = document.getElementById('sheet-url').value.trim();
+
+  var campos = [
+    { id: 'fecha',        label: 'Fecha' },
+    { id: 'supervisor',   label: 'Nombre del supervisor' },
+    { id: 'sector',       label: 'Sector' },
+    { id: 'dpi',          label: 'DPI' },
+    { id: 'nombre',       label: 'Nombre del extrero' },
+    { id: 'puesto-origen',label: 'Puesto de origen' },
+    { id: 'puesto-cubre', label: 'Puesto que cubre' },
+    { id: 'monto',        label: 'Monto' },
+  ];
+  for (var i = 0; i < campos.length; i++) {
+    if (!v(campos[i].id)) {
+      showToast('Campo requerido: ' + campos[i].label, true);
+      document.getElementById(campos[i].id).focus();
+      return;
+    }
+  }
+  if (!document.querySelector('input[name=turno]:checked'))       { showToast('Seleccione el tipo de turno.', true); return; }
+  if (!document.querySelector('input[name=motivo]:checked'))      { showToast('Seleccione el motivo.', true); return; }
+  if (!document.querySelector('input[name=inasistencia]:checked')){ showToast('Seleccione el motivo de inasistencia.', true); return; }
+
+  var payload = {
+    fecha:               v('fecha'),
+    supervisor:          v('supervisor'),
+    sector:              document.getElementById('sector').value,
+    dpi:                 v('dpi'),
+    nombre:              v('nombre'),
+    puestoOrigen:        v('puesto-origen'),
+    puestoCubre:         v('puesto-cubre'),
+    turno:               document.querySelector('input[name=turno]:checked').value,
+    motivo:              document.querySelector('input[name=motivo]:checked').value,
+    tipoServicioEspecial:v('tipo-servicio-especial') || '',
+    quienFalto:          v('quien-falto') || '',
+    inasistencia:        document.querySelector('input[name=inasistencia]:checked').value,
+    monto:               v('monto'),
+    tipoPago:            document.getElementById('tipo-pago').value,
+    observaciones:       v('observaciones') || '',
+  };
+
+  if (!url) {
+    showToast('⚠ Pegue la URL del Apps Script para enviar a Sheets.', true);
+    console.log('Datos del formulario:', payload);
+    return;
+  }
+
+  var btn = document.getElementById('btn-enviar');
+  btn.disabled = true;
+  btn.textContent = 'Enviando…';
+
+  try {
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    showToast('✓ Registro enviado a Google Sheets correctamente.');
+    limpiarFormulario();
+  } catch(err) {
+    showToast('Error al enviar. Verifique la URL y su conexión.', true);
+    console.error(err);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar registro →';
+  }
+}
+
+function limpiarFormulario() {
+  ['fecha','supervisor','dpi','nombre','puesto-origen','puesto-cubre',
+   'monto','quien-falto','tipo-servicio-especial','observaciones'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  document.getElementById('sector').value = '';
+  document.getElementById('tipo-pago').value = '';
+  document.getElementById('adjunto').value = '';
+  document.getElementById('dpi-status').className = 'dpi-status';
+  document.getElementById('dpi-counter').textContent = '0 / 8';
+  document.querySelectorAll('input[type=radio]').forEach(function(r) { r.checked = false; });
+  document.getElementById('cond-servicio').classList.remove('show');
+  document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+}
+
+// ── Init ──
+inicializarDB();
+renderDB();
+document.getElementById('fecha').value = new Date().toISOString().split('T')[0];
+document.addEventListener('click', function(e) {
+  if (!e.target.closest('.dpi-wrap')) cerrarAC();
+});
+</script>
+</body>
+</html>
